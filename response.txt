@@ -1,0 +1,67 @@
+A **RAG store** (Retrieval Augmented Generation store) is a specialized data
+repository that serves as the external knowledge base for a RAG system. Its
+primary purpose is to efficiently store, index, and retrieve relevant contextual
+information that can be used to augment a Large Language Model's (LLM)
+generation process.  Think of it as the LLM's personal, highly organized library
+of facts and domain-specific knowledge that it can consult *before* answering a
+user's query.  Here's a breakdown of what that entails:  ### Core Purpose and
+Function  The RAG store addresses key limitations of standalone LLMs: 1.
+**Hallucinations:** Prevents the LLM from generating false or nonsensical
+information. 2.  **Outdated Information:** Provides access to current or real-
+time data beyond the LLM's training cutoff. 3.  **Domain-Specific Knowledge:**
+Grounds the LLM in proprietary, private, or highly specialized information not
+present in its general training data. 4.  **Attribution/Transparency:** Allows
+the LLM to cite sources for its answers, increasing user trust.  To achieve
+this, the RAG store stores information in a way that facilitates **semantic
+search** – finding information based on its meaning, not just exact keyword
+matches.  ### Key Components and How it Works  1.  **Raw Data Sources:** This is
+the initial information you want your LLM to access. It can come from various
+formats:     *   Documents (PDFs, Word files, Markdown, HTML)     *   Databases
+(SQL, NoSQL)     *   Web pages     *   APIs     *   Internal knowledge bases,
+wikis, support tickets, etc.  2.  **Data Processing & Chunking:**     *   Large
+documents are typically too big to process efficiently or fit into an LLM's
+context window. Therefore, they are broken down into smaller, manageable pieces
+called "chunks."     *   Chunking strategies vary (e.g., fixed-size chunks,
+sentence-based, paragraph-based, recursive splitting) and are crucial for
+effective retrieval. Overlapping chunks are often used to maintain context.  3.
+**Embedding Model (Encoder):**     *   Each text chunk is then fed into an
+embedding model (e.g., Sentence-BERT, OpenAI Embeddings, Cohere Embeddings).
+*   This model transforms the text chunk into a high-dimensional numerical
+vector, also known as an "embedding." These vectors capture the semantic meaning
+of the text, where chunks with similar meanings have vectors that are
+numerically "closer" to each other in the vector space.  4.  **Vector Database
+(The "Store" Itself):**     *   This is the heart of the RAG store. A vector
+database is specifically designed to store and efficiently query these high-
+dimensional vectors.     *   Along with each vector, the database also stores
+the original text chunk (or a pointer to it) and often relevant metadata (e.g.,
+source document, author, date, section).     *   When a user submits a query,
+that query is also converted into a vector embedding. The vector database then
+performs a **similarity search** (e.g., using cosine similarity or Euclidean
+distance) to find the top-K (e.g., 3-10) most semantically similar text chunks
+from its stored knowledge base.  ### The RAG Process (Involving the Store)  1.
+**Ingestion:**     *   Raw data is collected.     *   Data is chunked.     *
+Chunks are embedded into vectors.     *   Vectors (and associated text/metadata)
+are stored in the RAG store (vector database).  2.  **Query Time:**     *   A
+user submits a natural language query.     *   The user's query is embedded into
+a vector using the *same* embedding model used during ingestion.     *   This
+query vector is sent to the RAG store.     *   The RAG store performs a vector
+similarity search to retrieve the most relevant text chunks (context) from its
+knowledge base.     *   These retrieved chunks are then combined with the
+original user query to form an "augmented prompt."     *   The augmented prompt
+is sent to the LLM.     *   The LLM generates a response, now "grounded" by the
+specific, relevant information provided by the RAG store.  ### Examples of RAG
+Store Technologies  While the concept is generic, the implementation almost
+always involves a **vector database** or a vector index:  *   **Dedicated Vector
+Databases:** Pinecone, Weaviate, Milvus, Qdrant, Chroma, Zilliz. *   **Vector
+Search Libraries:** Faiss (Facebook AI Similarity Search), Annoy, HNSWlib. *
+**Database Extensions:** pgvector (for PostgreSQL), Redis Stack (with
+RediSearch). *   **Cloud Services:** Azure AI Search (formerly Azure Cognitive
+Search), Google Cloud Vertex AI Matching Engine.  ### Analogy  Imagine an LLM as
+a brilliant but forgetful professor who only remembers what they learned in grad
+school. A RAG store is like a meticulously organized library and a diligent
+research assistant. When you ask the professor a question about a very recent
+event or a very specific niche topic they haven't encountered before, the
+research assistant (RAG system) quickly goes to the library (RAG store), finds
+the most relevant articles, summarizes them, and hands them to the professor
+*before* they formulate their answer. This ensures the professor's answer is
+accurate, up-to-date, and well-supported.
