@@ -6,7 +6,7 @@ from pathlib import Path
 
 from src.app.generator import RAGGenerator
 from src.app.retriever import KeywordSearch
-from src.app.metrics import CosineSimilarity
+from src.app.metrics import CosineSimilarity, EnhancedSimilarity
 
 
 def print_formatted_response(response):
@@ -42,9 +42,18 @@ prompt_used, response_text = generate.call_llm_with_full_text(augmented_input)
 cosine = CosineSimilarity()
 # Косинусное сходство
 score_cosine = cosine.calculate_cosine_similarity(query, best_matching_record)
+# Розширене сходство
+cosine_enh = EnhancedSimilarity()
+similarity_score = cosine_enh.calculate_enhanced_similarity(
+    query, best_matching_record)
+
 
 # --- Друк результату ---
 print(f"Best Keyword Score: {score:.3f}")
-print(f"Best Cosine Similarity Score: {score_cosine:.3f}")
 print_formatted_response(best_matching_record)
-print_formatted_response(response_text)
+print(f"Best Cosine Similarity Score: {score_cosine:.3f}")
+print(f"{query} : {best_matching_record}")
+print(f"Enhanced Similarity:, {similarity_score:.3f}")
+##print_formatted_response(response_text)
+
+

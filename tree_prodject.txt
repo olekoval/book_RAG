@@ -1,0 +1,22 @@
+D:.
+│   .env
+│   .gitignore
+│   main.py
+│   poetry.lock
+│   pyproject.toml
+│   README.md
+│   tree_prodject.txt
+│
+├───data
+│       db_records.txt
+│
+├───src
+│   └───app
+│           generator.py
+│           metrics.py
+│           retriever.py
+│           __init__.py
+│
+└───test
+        test_enhancedsimilarity.py
+        wordnet.py
