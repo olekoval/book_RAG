@@ -1,3 +1,5 @@
+from src.app.metrics import CosineSimilarity
+
 class KeywordSearch:
     """Пошук контексту до заптання по ключовим словам"""
 
@@ -26,6 +28,24 @@ class KeywordSearch:
                 best_record = record
 
         return best_score, best_record
+
+class VectorSearch:
+    """Векторний пошук"""
+    def __init__(self, db_records):
+        self.db_records = db_records
+        self.cos = CosineSimilarity()
+
+    def find_best_match(self, text_input, records):
+        best_score = 0
+        best_record = None
+        for record in records:
+            current_score = self.cos.calculate_cosine_similarity(text_input,
+                                                        record)
+            if current_score > best_score:
+                best_score = current_score
+                best_record = record
+        return best_score, best_record
+    
 
 
 if __name__ == "__main__":

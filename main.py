@@ -5,7 +5,7 @@ import textwrap
 from pathlib import Path
 
 from src.app.generator import RAGGenerator
-from src.app.retriever import KeywordSearch
+from src.app.retriever import KeywordSearch, VectorSearch
 from src.app.metrics import CosineSimilarity, EnhancedSimilarity
 
 
@@ -27,10 +27,13 @@ BASE_DIR = Path(__file__).resolve().parent # шлях до каталогу з m
 data_path = BASE_DIR / "data" / "db_records.txt"
 with open(data_path, encoding="utf-8") as f:
     db_records = [line.strip() for line in f]
+
+# Питання користувача 
+query = "define a rag store"
     
+# SIMPLE SEARCH   
 # --- Пошук контексту до query ---
 retriever = KeywordSearch(db_records)
-query = "define a rag store"
 score, best_matching_record = retriever.find_best_match_keyword_search(query)
 augmented_input = query + ": " + best_matching_record
 
@@ -49,11 +52,39 @@ similarity_score = cosine_enh.calculate_enhanced_similarity(
 
 
 # --- Друк результату ---
+print("*** SIMPLE SEARCH ***")
 print(f"Best Keyword Score: {score:.3f}")
 print_formatted_response(best_matching_record)
 print(f"Best Cosine Similarity Score: {score_cosine:.3f}")
 print(f"{query} : {best_matching_record}")
 print(f"Enhanced Similarity:, {similarity_score:.3f}")
 ##print_formatted_response(response_text)
+
+# VECTOR SEARCH
+# --- Пошук контексту до query ---
+retriever_vector = VectorSearch(db_records)
+best_similarity_score, best_matching_record = retriever_vector.find_best_match(query, db_records)
+
+print()
+print("*** VECTOR SEARCH ***")
+print_formatted_response(best_matching_record)
+# --- Metrics ---
+print(f"Best Cosine Similarity Score: {best_similarity_score:.3f}")
+# Расширенное сходство
+cenh = EnhancedSimilarity()
+response = best_matching_record
+print(query,": ", response)
+similarity_score = cenh.calculate_enhanced_similarity(query, best_matching_record)
+print(f"Enhanced Similarity:, {similarity_score:.3f}")
+# --- Генерація ---
+# Вызов функции и вывод результата
+augmented_input=query+": "+best_matching_record
+print_formatted_response(augmented_input)
+
+generate_vector = RAGGenerator(client=client)
+llm_prompt, llm_response = generate_vector.call_llm_with_full_text(augmented_input)
+print_formatted_response(llm_response)
+
+
 
 
